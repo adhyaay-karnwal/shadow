@@ -3,7 +3,6 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --filter=!sidecar",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
@@ -23,8 +22,12 @@
     "db:prod:reset:push": "./scripts/db-prod.sh db push --force-reset",
     "db:prod:migrate:status": "./scripts/db-prod.sh migrate status",
     "db:prod:migrate:resolve": "./scripts/db-prod.sh migrate resolve",
-    "db:prod:migrate:diff": "./scripts/db-prod.sh migrate diff",
-    "generate": "turbo run generate"
+    "db:generate": "dotenv -e apps/server/.env -- turbo run generate",
+    "start:dev": "concurrently \\"npm:start:server:dev\\" \\"npm:start:sidecar:dev\\" \\"npm:start:frontend:dev\\"",
+    "start:server:dev": "nodemon --watch 'apps/server/src/**/*.ts' --exec 'npm run dev -- --filter=server'",
+    "start:sidecar:dev": "nodemon --watch 'apps/sidecar/src/**/*.ts' --exec 'npm run dev -- --filter=sidecar'",
+    "start:frontend:dev": "nodemon --watch 'apps/frontend/src/**/*.tsx' --exec 'npm run dev -- --filter=frontend'",
+    "dev": "turbo run dev"
   },
   "prisma": {
     "schema": "packages/db/prisma/schema.prisma"
@@ -46,3 +49,4 @@
     "packages/*"
   ]
 }
+
