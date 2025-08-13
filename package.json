@@ -30,6 +30,9 @@
     "schema": "packages/db/prisma/schema.prisma"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
+    "dotenv-cli": "^7.4.2",
+    "nodemon": "^3.1.4",
     "prettier": "^3.6.2",
     "turbo": "^2.5.4",
     "typescript": "5.8.3"
