@@ -1,0 +1,20 @@
+{
+  "appId": "com.shade.app",
+  "productName": "Shade",
+  "directories": {
+    "output": "dist_electron"
+  },
+  "files": [
+    "dist/**",
+    "preload.js",
+    "main.js",
+    "../frontend/.next/**"
+  ],
+  "mac": {
+    "target": ["dmg", "zip"],
+    "category": "public.app-category.productivity"
+  },
+  "win": {
+    "target": ["nsis"]
+  }
+}
