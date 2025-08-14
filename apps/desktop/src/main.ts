@@ -3,6 +3,7 @@ import path from 'path'
 import { spawn, ChildProcess } from 'child_process'
 import getPort from 'get-port'
 import waitOn from 'wait-on'
+import { EventEmitter } from 'events'
 
 let serverProcess: ChildProcess | null = null
 
@@ -79,6 +80,61 @@ type IpcAPI = {
   settings: () => Promise<any>
 }
 
+// === IPC Event Bus setup ===
+import { EventEmitter } from 'events'
+
+const allowedChannels = [
+  "stream-state",
+  "stream-chunk",
+  "stream-complete",
+  "stream-error",
+  "task-status-updated",
+  "terminal-output",
+  "terminal-cleared",
+  "message-error",
+  "chat-history",
+  "chat-history-error",
+  "auto-pr-status",
+  "queued-action-processing"
+] as const;
+
+const eventBus = new EventEmitter();
+
+// Listen for renderer "emit" events (from preload)
+ipcMain.onAny?.((channel: string, ...args: any[]) => {
+  if (allowedChannels.includes(channel as any)) {
+    eventBus.emit(channel, ...args);
+  }
+});
+
+// Subscribe/unsubscribe event forwarding
+allowedChannels.forEach(channel => {
+  ipcMain.on(channel, (event, payload) => {
+    // These are stubs -- in future, real event producers will emit here
+    // For now, just log or do nothing
+  });
+});
+
+// Allow renderer to subscribe/unsubscribe to events
+ipcMain.handle('on', (event, channel) => {
+  if (!allowedChannels.includes(channel)) return;
+  const listener = (_event: any, payload: any) => {
+    event.sender.send(channel, payload);
+  };
+  eventBus.on(channel, listener);
+  return () => eventBus.off(channel, listener);
+});
+ipcMain.handle('off', (event, channel) => {
+  if (!allowedChannels.includes(channel)) return;
+  eventBus.removeAllListeners(channel);
+});
+ipcMain.handle('emit', (_event, channel, payload) => {
+  if (allowedChannels.includes(channel)) {
+    eventBus.emit(channel, payload);
+  }
+});
+
+// --- Existing handlers ---
 ipcMain.handle('chat', async (_event, message) => message)
 ipcMain.handle('tasks', async () => [])
 ipcMain.handle('files', async () => [])
