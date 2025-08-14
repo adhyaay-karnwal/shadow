@@ -1,24 +1,29 @@
 "use client";
 
-import { io, Socket } from "socket.io-client";
 import type { ServerToClientEvents, ClientToServerEvents } from "@repo/types";
+import { ipcSocket } from "./ipc-socket";
 
-const RECONNECTION_DELAY = 1000;
-const RECONNECTION_DELAY_MAX = 5000;
-const RECONNECTION_ATTEMPTS = 5;
-const TIMEOUT = 20000;
+// Define a minimal TypedSocket interface for compatibility
+export interface TypedSocket {
+  connect(): void;
+  disconnect(): void;
+  on(event: string, handler: (...args: any[]) => void): void;
+  off(event: string, handler: (...args: any[]) => void): void;
+  emit(event: string, payload?: any): void;
+}
 
-export type TypedSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
+export const socket: TypedSocket = ipcSocket;
 
-const socketUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:4001";
+import type { ServerToClientEvents, ClientToServerEvents } from "@repo/types";
+import { ipcSocket } from "./ipc-socket";
 
-export const socket: TypedSocket = io(socketUrl, {
-  autoConnect: false,
-  reconnection: true,
-  reconnectionAttempts: RECONNECTION_ATTEMPTS,
-  reconnectionDelay: RECONNECTION_DELAY,
-  reconnectionDelayMax: RECONNECTION_DELAY_MAX,
-  timeout: TIMEOUT,
-  forceNew: false,
-  withCredentials: true,
-});
+// Define a minimal TypedSocket interface for compatibility
+export interface TypedSocket {
+  connect(): void;
+  disconnect(): void;
+  on(event: string, handler: (...args: any[]) => void): void;
+  off(event: string, handler: (...args: any[]) => void): void;
+  emit(event: string, payload?: any): void;
+}
+
+export const socket: TypedSocket = ipcSocket;

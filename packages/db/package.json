@@ -10,18 +10,16 @@
     }
   },
   "scripts": {
-    "build": "tsc",
-    "db:migrate:deploy": "prisma migrate deploy",
-    "db:migrate:dev": "prisma migrate dev",
-    "db:push": "prisma db push",
-    "db:push:reset": "prisma db push --force-reset",
-    "db:studio": "prisma studio",
-    "dev": "tsup src/* --watch",
-    "lint": "eslint 'src/**/*.ts'",
-    "format": "prisma format",
-    "generate": "prisma generate",
-    "prebuild": "npm run generate",
-    "predev": "npm run generate"
+    "prebuild": "prisma generate",
+    "build": "rimraf dist && tsup src/*.ts --dts",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "prisma": "^6.0.0",
+    "electron": "^31.0.0"
   },
   "dependencies": {
     "@prisma/client": "latest"

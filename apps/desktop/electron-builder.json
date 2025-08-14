@@ -1,0 +1,29 @@
+{
+  "appId": "com.shade.app",
+  "productName": "Shade",
+  "directories": {
+    "output": "dist_electron"
+  },
+  "files": [
+    "dist/**",
+    "preload.js",
+    "main.js",
+    "../frontend/.next/**"
+  ],
+  "asarUnpack": [
+    "**/node_modules/@prisma/**",
+    "**/node_modules/.prisma/**"
+  ],
+  "extraResources": [
+    { "from": "../frontend/.next/standalone", "to": "frontend/standalone" },
+    { "from": "../frontend/.next/static", "to": "frontend/.next/static" },
+    { "from": "../frontend/public", "to": "frontend/public" }
+  ],
+  "mac": {
+    "target": ["dmg", "zip"],
+    "category": "public.app-category.productivity"
+  },
+  "win": {
+    "target": ["nsis"]
+  }
+}

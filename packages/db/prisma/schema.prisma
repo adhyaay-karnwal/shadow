@@ -1,13 +1,15 @@
 generator client {
-  provider      = "prisma-client-js"
-  output        = "../generated/client"
-  binaryTargets = ["native", "rhel-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -283,7 +285,7 @@ model UserSettings {
   autoPullRequest  Boolean  @default(false)
   enableShadowWiki Boolean  @default(true)
   enableIndexing   Boolean  @default(false)
-  selectedModels   String[] @default([])
+  selectedModels   Json     @default("[]")
   rules            String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

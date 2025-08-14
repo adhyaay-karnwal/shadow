@@ -1,10 +1,13 @@
-# Shadow
+# Shade (formerly Shadow)
 
-![Shadow Screenshot](https://raw.githubusercontent.com/ishaan1013/shadow/refs/heads/main/apps/frontend/app/opengraph-image.png)
+Shade is a local-first, cross-platform desktop app (Electron) with database, server, and frontend modules.
 
-An open-source background coding agent. Designed to understand, reason about, and contribute to existing codebases. Licensed for open-source use under MIT License
+## Local-first database
 
-Sets up isolated execution environments for AI agents to work on GitHub repositories with tools to understand code, edit files, and much more.
+- The database now uses SQLite for local-first persistence.
+- When running in Electron, the database file is stored in your user data directory (`shade.db`).
+- For dev CLI or scripts, fallback is `.localdb/shade.db` in your project root.
+- Previous Postgres data migration is not supported yet; a placeholder script is provided in `packages/db/scripts/migrate-data.ts`.
 
 ### Agent Environment (The Shadow Realm)
 - GitHub repository integration with branch management
@@ -40,15 +43,13 @@ Mode selection is controlled by `NODE_ENV` and `AGENT_MODE` environment variable
 
 ### Repository Structure
 
-- **Frontend** (`apps/frontend/`) - Next.js application with real-time chat interface, terminal emulator, file explorer, and task management
-- **Server** (`apps/server/`) - Node.js orchestrator handling LLM integration, WebSocket communication, task initialization, and API endpoints
-- **Sidecar** (`apps/sidecar/`) - Express.js service providing REST APIs for file operations within isolated containers
-- **Website** (`apps/website/`) - Marketing and landing page
-- **Database** (`packages/db/`) - Prisma schema and PostgreSQL client with comprehensive data models
-- **Types** (`packages/types/`) - Shared TypeScript type definitions for the entire platform
-- **Command Security** (`packages/command-security/`) - Security utilities for command validation and sanitization
-- **ESLint Config** (`packages/eslint-config/`) - Shared linting rules
-- **TypeScript Config** (`packages/typescript-config/`) - Shared TypeScript configurations
+- Monorepo (Turbo): apps/frontend (Next.js 15), apps/desktop (Electron 31+), apps/server (Express + Socket.IO, agent logic, indexing, Shadow Wiki, GitHub integration), apps/sidecar (remote helper), packages/db (Prisma SQLite local-first), packages/types, packages/command-security.
+
+## Desktop app (Shade)
+
+- Run `pnpm desktop:dev` for dev (Next.js dev server + Electron).
+- Run `pnpm desktop:build` then `pnpm desktop:package` for production builds (macOS dmg/zip, Windows nsis).
+- The Electron app loads the Next.js frontend and uses a local SQLite DB (`shade.db`) in your user data directory.
 
 
 ### Prerequisites
