@@ -10,10 +10,11 @@
     }
   },
   "scripts": {
+    "prebuild": "prisma generate",
+    "build": "rimraf dist && tsup src/*.ts --dts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
-    "build": "prisma generate"
+    "prisma:studio": "prisma studio"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

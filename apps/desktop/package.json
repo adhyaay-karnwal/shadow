@@ -1,14 +1,15 @@
 {
   "name": "desktop",
-  "version": "0.1.0",
   "main": "dist/main.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development vite --config vite.main.config.ts",
-    "dev:electron": "wait-on tcp:3000 && electron .",
-    "build": "vite build --config vite.main.config.ts && vite build --config vite.preload.config.ts",
-    "start": "electron .",
-    "package": "electron-builder"
+    "dev": "electron .",
+    "build": "tsc"
   },
+  "dependencies": {
+    "get-port": "^7.0.0",
+    "wait-on": "^7.0.1"
+  }
+},
   "devDependencies": {
     "electron": "^31.0.0",
     "electron-builder": "^24.14.1",

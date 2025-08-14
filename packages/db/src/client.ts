@@ -1,10 +1,26 @@
-import { PrismaClient } from "../generated/client";
+import { PrismaClient } from '@prisma/client'
+import path from 'path'
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+// Try to require Electron's app if available
+function ensureElectronPrisma() {
+  let userData: string | undefined = undefined
+  try {
+    // Try to use electron.app.getPath if running in Electron main
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const electron = require('electron')
+    userData = electron.app?.getPath?.('userData')
+  } catch {}
+  if (userData) {
+    process.env.DATABASE_URL = `file:${path.join(userData, 'db.sqlite')}`
+  } else if (process.env.DATABASE_URL == null) {
+    // Fallback for CLI/dev: .localdb in project root
+    process.env.DATABASE_URL = `file:${path.resolve(process.cwd(), '.localdb', 'db.sqlite')}`
+  }
+}
 
-export const prisma = globalForPrisma.prisma || new PrismaClient();
-export const db = prisma; // Export as db for convenience
+ensureElectronPrisma()
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+export const prisma = new PrismaClient()
+export const db = prisma
 
-export * from "../generated/client";
+export * from '@prisma/client'

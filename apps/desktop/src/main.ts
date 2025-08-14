@@ -1,22 +1,29 @@
-import { app, BrowserWindow, protocol } from 'electron';
-import path from 'path';
-import { spawn } from 'child_process';
+import { app, BrowserWindow, ipcMain } from 'electron'
+import path from 'path'
+import { spawn, ChildProcess } from 'child_process'
+import getPort from 'get-port'
+import waitOn from 'wait-on'
 
-const isDev = process.env.NODE_ENV === 'development' || process.env.ELECTRON_DEV === '1';
+let serverProcess: ChildProcess | null = null
 
-let mainWindow: BrowserWindow | undefined;
+async function startNextStandaloneServer(resourcesRoot: string): Promise<{ url: string, port: number }> {
+  const serverDir = path.join(resourcesRoot, 'frontend', 'standalone')
+  const serverEntry = path.join(serverDir, 'server.js')
+  const port = await getPort({ port: getPort.makeRange(5123, 5200) })
+  const env = { ...process.env, PORT: String(port) }
 
-function getRendererUrl() {
-  if (isDev) {
-    return 'http://localhost:3000';
-  } else {
-    // Serve exported Next.js build via file:// protocol
-    return `file://${path.join(__dirname, '../../frontend/out/index.html')}`;
-  }
+  serverProcess = spawn(process.execPath, [serverEntry], {
+    cwd: serverDir,
+    env,
+    stdio: 'inherit'
+  })
+
+  await waitOn({ resources: [`tcp:127.0.0.1:${port}`], timeout: 15000 })
+  return { url: `http://127.0.0.1:${port}`, port }
 }
 
-function createWindow() {
-  mainWindow = new BrowserWindow({
+function createWindow(url: string) {
+  const win = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 1100,
@@ -28,31 +35,54 @@ function createWindow() {
       enableRemoteModule: false,
     },
     show: false
-  });
-
-  const url = getRendererUrl();
-  mainWindow.loadURL(url);
-
-  mainWindow.once('ready-to-show', () => {
-    mainWindow?.show();
-  });
-
-  if (isDev) mainWindow.webContents.openDevTools();
+  })
+  win.loadURL(url)
+  win.once('ready-to-show', () => {
+    win.show()
+  })
+  if (process.env.NODE_ENV === 'development') win.webContents.openDevTools()
 }
 
-app.on('ready', async () => {
-  if (isDev) {
-    // Start Next.js dev server if not already running
-    const nextProc = spawn('pnpm', ['run', 'dev'], {
-      cwd: path.join(__dirname, '../../frontend'),
-      stdio: 'inherit',
-      shell: true,
-    });
-    // Wait-on handled in dev script
+async function launch() {
+  let url = 'http://localhost:3000'
+  if (app.isPackaged) {
+    const resourcesRoot = app.isPackaged
+      ? process.resourcesPath
+      : path.resolve(__dirname, '../../frontend')
+    const { url: prodUrl } = await startNextStandaloneServer(resourcesRoot)
+    url = prodUrl
   }
-  createWindow();
-});
+  createWindow(url)
+}
+
+app.whenReady().then(launch)
+
+app.on('before-quit', () => {
+  if (serverProcess) {
+    serverProcess.kill()
+    serverProcess = null
+  }
+})
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
+  if (process.platform !== 'darwin') app.quit()
+})
+
+/** --- IPC Skeletons --- */
+type IpcAPI = {
+  chat: (message: string) => Promise<string>
+  tasks: () => Promise<any[]>
+  files: () => Promise<any[]>
+  terminal: (cmd: string) => Promise<{ output: string }>
+  wikiStatus: () => Promise<{ status: string }>
+  git: (cmd: string) => Promise<any>
+  settings: () => Promise<any>
+}
+
+ipcMain.handle('chat', async (_event, message) => message)
+ipcMain.handle('tasks', async () => [])
+ipcMain.handle('files', async () => [])
+ipcMain.handle('terminal', async (_event, cmd) => ({ output: `Executed: ${cmd}` }))
+ipcMain.handle('wikiStatus', async () => ({ status: 'ok' }))
+ipcMain.handle('git', async (_event, cmd) => ({ result: `Ran git: ${cmd}` }))
+ipcMain.handle('settings', async () => ({}))
