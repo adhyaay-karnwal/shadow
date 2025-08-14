@@ -13,8 +13,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for better-auth session token in cookies
-  const sessionToken = request.cookies.get("better-auth.session_token");
+  // This middleware previously checked for session tokens, but the backend and auth are removed.
+// If you need to add auth, use a frontend-only approach or Vercel's built-in integrations.
 
   // If no session token, redirect to auth page
   if (!sessionToken) {

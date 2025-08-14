@@ -18,7 +18,6 @@
     "@octokit/rest": "^22.0.0",
     "@octokit/types": "^14.1.0",
     "@openrouter/ai-sdk-provider": "^0.7.3",
-    "@prisma/nextjs-monorepo-workaround-plugin": "6.13.0",
     "@radix-ui/react-checkbox": "^1.3.2",
     "@radix-ui/react-collapsible": "^1.1.11",
     "@radix-ui/react-context-menu": "^2.2.15",
@@ -38,7 +37,6 @@
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",
     "ai": "^4.3.19",
-    "better-auth": "^1.2.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "diff": "^8.0.2",
@@ -56,10 +54,10 @@
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
     "use-stick-to-bottom": "^1.1.1",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "@trigger.dev/sdk": "^4.0.0"
   },
   "devDependencies": {
-    "@repo/db": "*",
     "@repo/eslint-config": "^0.0.0",
     "@repo/typescript-config": "*",
     "@shikijs/monaco": "^3.8.1",
@@ -78,5 +76,16 @@
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
     "lightningcss-linux-x64-gnu": "^1.29.1"
+  },
+  "scripts": {
+    "dev": "next dev --turbopack --port 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "check-types": "tsc --noEmit",
+    "format": "prettier --write .",
+    "trigger:init": "npx trigger.dev@latest init",
+    "trigger:dev": "npx trigger.dev@latest dev",
+    "trigger:deploy": "npx trigger.dev@latest deploy"
   }
 }
